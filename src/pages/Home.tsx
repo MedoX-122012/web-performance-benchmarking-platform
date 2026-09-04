@@ -102,7 +102,6 @@ export default function Home() {
   const [url, setUrl] = useState('');
   const [device, setDevice] = useState<DeviceType>('desktop');
   const [connection, setConnection] = useState<ConnectionProfile>('fast');
-  const [demoMode, setDemoMode] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
   const [visibleCards, setVisibleCards] = useState<boolean[]>(new Array(6).fill(false));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -167,9 +166,9 @@ export default function Home() {
         showToast('Please enter a valid URL (e.g., https://example.com)');
         return;
       }
-      startBenchmark(fullUrl, device, connection, demoMode);
+      startBenchmark(fullUrl, device, connection);
     },
-    [url, device, connection, demoMode, startBenchmark, showToast],
+    [url, device, connection, startBenchmark, showToast],
   );
 
   const handleExample = useCallback(() => {
@@ -481,39 +480,6 @@ export default function Home() {
               </fieldset>
             </div>
 
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-sm)',
-                cursor: isRunning ? 'not-allowed' : 'pointer',
-                opacity: isRunning ? 0.6 : 1,
-                padding: '10px 16px',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: demoMode ? 'rgba(99,102,241,0.08)' : 'var(--bg-card)',
-                transition: 'all 150ms ease',
-                width: '100%',
-                maxWidth: 320,
-                justifyContent: 'center',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={demoMode}
-                onChange={(e) => setDemoMode(e.target.checked)}
-                disabled={isRunning}
-                style={{
-                  width: 18,
-                  height: 18,
-                  accentColor: 'var(--color-primary)',
-                  cursor: 'pointer',
-                }}
-              />
-              <span style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>
-                Use demo mode (simulated data)
-              </span>
-            </label>
           </div>
         )}
       </section>

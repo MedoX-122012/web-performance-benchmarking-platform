@@ -48,7 +48,7 @@ export default function TestHistoryCard({
   return (
     <div
       className={`bg-gray-900 rounded-xl border transition-all group ${
-        selected ? 'border-teal-500/50 ring-1 ring-teal-500/20' : 'border-gray-800 hover:border-gray-700'
+        selected ? 'border-blue-500/50 ring-1 ring-blue-500/20' : 'border-gray-800 hover:border-gray-700'
       }`}
     >
       <div className="p-4">
@@ -60,7 +60,7 @@ export default function TestHistoryCard({
                   type="checkbox"
                   checked={selected}
                   onChange={() => onToggleCompare(entry.id)}
-                  className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-teal-500 focus:ring-teal-500/30"
+                  className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500/30"
                 />
               )}
               <h4 className="text-sm font-medium text-gray-200 truncate">{hostname}</h4>
@@ -130,7 +130,7 @@ export default function TestHistoryCard({
                 </button>
                 <button
                   onClick={() => onView(entry.id)}
-                  className="px-3 py-1 text-[10px] font-medium text-teal-400 bg-teal-500/10 rounded hover:bg-teal-500/20 transition-colors"
+                  className="px-3 py-1 text-[10px] font-medium text-blue-400 bg-blue-500/10 rounded hover:bg-blue-500/20 transition-colors"
                 >
                   View Report
                 </button>

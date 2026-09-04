@@ -14,13 +14,13 @@ const CATEGORY_COLORS: Record<ThirdPartyDomain['category'], { bg: string; text: 
   advertising: { bg: 'bg-rose-500/20', text: 'text-rose-400' },
   social: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
   fonts: { bg: 'bg-emerald-500/20', text: 'text-emerald-400' },
-  cdn: { bg: 'bg-teal-500/20', text: 'text-teal-400' },
+  cdn: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   other: { bg: 'bg-gray-500/20', text: 'text-gray-400' },
 };
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active) return <span className="text-gray-600 ml-1">↕</span>;
-  return <span className="text-teal-400 ml-1">{dir === 'asc' ? '↑' : '↓'}</span>;
+  return <span className="text-blue-400 ml-1">{dir === 'asc' ? '↑' : '↓'}</span>;
 }
 
 export default function ThirdPartyTable({ domains }: ThirdPartyTableProps) {

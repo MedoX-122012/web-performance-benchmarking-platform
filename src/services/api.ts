@@ -7,8 +7,6 @@ import type {
 } from '@types/index';
 
 function getBaseUrl(): string {
-  if (typeof window === 'undefined') return '';
-  if (window.location.port === '5173') return 'http://localhost:3001';
   return '';
 }
 
@@ -35,11 +33,10 @@ export function fetchBenchmark(
   url: string,
   device: DeviceType,
   connection: ConnectionProfile,
-  demoMode: boolean,
 ): Promise<{ jobId: string }> {
   return request('/api/benchmarks', {
     method: 'POST',
-    body: JSON.stringify({ url, device, connection, demoMode }),
+    body: JSON.stringify({ url, device, connection }),
   });
 }
 

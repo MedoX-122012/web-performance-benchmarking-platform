@@ -334,7 +334,6 @@ export interface BenchmarkRequest {
   url: string;
   device: DeviceType;
   connection: ConnectionProfile;
-  demoMode?: boolean;
 }
 
 /** Complete benchmark result with all metrics */
@@ -364,7 +363,6 @@ export interface BenchmarkResult {
   compressionAnalysis: CompressionAnalysis;
   securityAnalysis: SecurityAnalysis;
   waterfall: WaterfallEntry[];
-  isDemoData?: boolean;
 }
 
 // -----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { generateDemoResult } from '@utils/demoData';
+import { useCallback, useRef, useState } from 'react';
+import { fetchBenchmark, getJobStatus, subscribeToProgress } from '@/services/api';
 import type {
   BenchmarkResult,
   DeviceType,
@@ -28,50 +28,125 @@ const initialState: BenchmarkState = {
 
 export function useStartBenchmark() {
   const [state, setState] = useState<BenchmarkState>(initialState);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  const cleanup = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+  }, []);
 
   const reset = useCallback(() => {
+    cleanup();
     setState(initialState);
-  }, []);
+  }, [cleanup]);
+
+  const cancel = useCallback(() => {
+    cleanup();
+    setState((prev) => ({
+      ...prev,
+      phase: 'cancelled',
+      error: 'Cancelled by user',
+    }));
+  }, [cleanup]);
 
   const startBenchmark = useCallback(
     (
       url: string,
       device: DeviceType,
       connection: ConnectionProfile,
-      demoMode: boolean,
     ) => {
+      cleanup();
       setState({ ...initialState, phase: 'submitting' });
 
-      if (demoMode) {
-        const result = generateDemoResult(url, device, connection);
-        const id = `demo-${Date.now()}`;
-        setState({
-          phase: 'completed',
-          jobId: id,
-          progress: 100,
-          stage: 'Complete',
-          result,
-          error: null,
+      fetchBenchmark(url, device, connection)
+        .then(({ jobId }) => {
+          setState((prev) => ({
+            ...prev,
+            phase: 'running',
+            jobId,
+            progress: 10,
+            stage: 'Benchmark started',
+          }));
+
+          // Subscribe to progress events
+          const es = subscribeToProgress(jobId, (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              setState((prev) => ({
+                ...prev,
+                progress: data.progress || prev.progress,
+                stage: data.stage || prev.stage,
+              }));
+
+              if (data.progress >= 100) {
+                es.close();
+                eventSourceRef.current = null;
+              }
+            } catch {
+              // Ignore parse errors
+            }
+          });
+          eventSourceRef.current = es;
+
+          // Poll for job status
+          intervalRef.current = setInterval(async () => {
+            try {
+              const job = await getJobStatus(jobId);
+
+              if (job.status === 'completed' && job.result) {
+                cleanup();
+                setState({
+                  phase: 'completed',
+                  jobId,
+                  progress: 100,
+                  stage: 'Complete',
+                  result: job.result,
+                  error: null,
+                });
+              } else if (job.status === 'failed') {
+                cleanup();
+                setState({
+                  phase: 'failed',
+                  jobId,
+                  progress: 0,
+                  stage: '',
+                  result: null,
+                  error: job.error || 'Benchmark failed',
+                });
+              } else {
+                // Update progress from polling
+                setState((prev) => ({
+                  ...prev,
+                  progress: job.progress || prev.progress,
+                  stage: job.stage || prev.stage,
+                }));
+              }
+            } catch (err) {
+              // Don't fail immediately on poll errors, keep trying
+            }
+          }, 2000);
+        })
+        .catch((err) => {
+          cleanup();
+          setState({
+            phase: 'failed',
+            jobId: null,
+            progress: 0,
+            stage: '',
+            result: null,
+            error: err.message || 'Failed to start benchmark',
+          });
         });
-        return;
-      }
-
-      setState((prev) => ({
-        ...prev,
-        phase: 'failed',
-        error: 'Live benchmarking requires a backend server. Please enable Demo Mode or run the backend with "npm run dev:full".',
-      }));
     },
-    [],
+    [cleanup],
   );
-
-  const cancel = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      phase: 'cancelled',
-      error: 'Cancelled by user',
-    }));
-  }, []);
 
   return {
     ...state,
