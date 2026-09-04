@@ -13,7 +13,7 @@ import type {
   HistoryEntry,
 } from '@types/index';
 import { useGetHistory } from '@hooks/useHistory';
-import { getFullResult } from '@utils/storage';
+import { getFullResult, getHistoryForUrl } from '@utils/storage';
 import {
   formatBytes,
   formatDuration,
