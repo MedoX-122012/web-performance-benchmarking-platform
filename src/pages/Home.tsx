@@ -21,7 +21,7 @@ function isValidUrl(input: string): boolean {
 
 export default function Home() {
   const navigate = useNavigate();
-  const { phase, progress, stage, result, error, startBenchmark, reset, cancel } = useStartBenchmark();
+  const { phase, progress, stage, result, error, cooldown, startBenchmark, reset, cancel } = useStartBenchmark();
   const [url, setUrl] = useState('');
   const [device, setDevice] = useState<DeviceType>('desktop');
   const [connection, setConnection] = useState<ConnectionProfile>('fast');
@@ -56,6 +56,7 @@ export default function Home() {
   );
 
   const isRunning = phase === 'submitting' || phase === 'running';
+  const isCoolingDown = cooldown > 0;
 
   return (
     <div style={{ minHeight: 'calc(100vh - 56px)', display: 'flex', flexDirection: 'column' }}>
@@ -92,7 +93,7 @@ export default function Home() {
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://example.com"
-                  disabled={isRunning}
+                  disabled={isRunning || isCoolingDown}
                   style={{
                     flex: 1,
                     padding: '10px 14px',
@@ -109,7 +110,7 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  disabled={isRunning}
+                  disabled={isRunning || isCoolingDown}
                   style={{
                     padding: '10px 24px',
                     fontSize: 'var(--font-sm)',
@@ -118,8 +119,8 @@ export default function Home() {
                     backgroundColor: 'var(--color-primary)',
                     color: '#fff',
                     border: 'none',
-                    cursor: isRunning ? 'not-allowed' : 'pointer',
-                    opacity: isRunning ? 0.5 : 1,
+                    cursor: isRunning || isCoolingDown ? 'not-allowed' : 'pointer',
+                    opacity: isRunning || isCoolingDown ? 0.5 : 1,
                     transition: 'background-color 120ms ease',
                     whiteSpace: 'nowrap',
                   }}
@@ -132,7 +133,7 @@ export default function Home() {
                 <fieldset style={{ border: 'none', padding: 0, display: 'flex', gap: 8, alignItems: 'center' }}>
                   <legend style={{ fontSize: 'var(--font-xs)', fontWeight: 500, color: 'var(--text-muted)', marginRight: 4 }}>Device</legend>
                   {(['desktop', 'mobile'] as DeviceType[]).map((d) => (
-                    <button key={d} type="button" onClick={() => setDevice(d)} disabled={isRunning} style={{
+                    <button key={d} type="button" onClick={() => setDevice(d)} disabled={isRunning || isCoolingDown} style={{
                       padding: '6px 14px', borderRadius: 'var(--radius-md)', fontSize: 'var(--font-sm)',
                       border: `1px solid ${device === d ? 'var(--color-primary)' : 'var(--border-color)'}`,
                       backgroundColor: device === d ? 'var(--bg-hover)' : 'transparent',
@@ -148,7 +149,7 @@ export default function Home() {
                 <fieldset style={{ border: 'none', padding: 0, display: 'flex', gap: 8, alignItems: 'center' }}>
                   <legend style={{ fontSize: 'var(--font-xs)', fontWeight: 500, color: 'var(--text-muted)', marginRight: 4 }}>Network</legend>
                   {(['fast', '4g'] as ConnectionProfile[]).map((c) => (
-                    <button key={c} type="button" onClick={() => setConnection(c)} disabled={isRunning} style={{
+                    <button key={c} type="button" onClick={() => setConnection(c)} disabled={isRunning || isCoolingDown} style={{
                       padding: '6px 14px', borderRadius: 'var(--radius-md)', fontSize: 'var(--font-sm)',
                       border: `1px solid ${connection === c ? 'var(--color-primary)' : 'var(--border-color)'}`,
                       backgroundColor: connection === c ? 'var(--bg-hover)' : 'transparent',
@@ -162,6 +163,26 @@ export default function Home() {
                 </fieldset>
               </div>
             </form>
+
+            {isCoolingDown && (
+              <div style={{
+                padding: '10px 16px',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'color-mix(in srgb, var(--color-warning) 15%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--color-warning) 30%, transparent)',
+                color: 'var(--color-warning)',
+                fontSize: 'var(--font-sm)',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}>
+                <span>Rate limited. Please wait {cooldown} seconds before trying again.</span>
+                <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
+                  {Math.floor(cooldown / 60)}:{String(cooldown % 60).padStart(2, '0')}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </section>

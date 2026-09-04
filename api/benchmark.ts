@@ -54,6 +54,143 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
   return response;
 }
 
+async function tryWebPageTestFallback(url: string, strategy: string): Promise<BenchmarkResult | null> {
+  const wptKey = process.env.WEBPAGETEST_API_KEY || '';
+  if (!wptKey) {
+    console.log('[WPT] No WebPageTest API key configured, skipping fallback');
+    return null;
+  }
+
+  console.log(`[WPT] Trying fallback for ${url}`);
+
+  try {
+    // Step 1: Submit test
+    const testUrl = `https://www.webpagetest.org/runtest.php?url=${encodeURIComponent(url)}&f=json&k=${wptKey}&runs=1&fvonly=1&lighthouse=1&video=0&f=csv`;
+    const submitRes = await fetch(testUrl);
+    if (!submitRes.ok) {
+      console.log(`[WPT] Submit failed: ${submitRes.status}`);
+      return null;
+    }
+
+    const submitData = await submitRes.json();
+    const testId = submitData.data?.testId;
+    if (!testId) {
+      console.log('[WPT] No test ID returned');
+      return null;
+    }
+
+    // Step 2: Poll for results (max 3 minutes)
+    const baseUrl = submitData.data?.jsonUrl || `https://www.webpagetest.org/results/${testId}`;
+    const csvUrl = `https://www.webpagetest.org/results.csv/${testId}`;
+    const maxPolls = 36;
+    const pollInterval = 5000;
+
+    for (let i = 0; i < maxPolls; i++) {
+      await sleep(pollInterval);
+
+      const pollUrl = `${baseUrl}?f=json`;
+      const pollRes = await fetch(pollUrl);
+      if (!pollRes.ok) continue;
+
+      const pollData = await pollRes.json();
+      const testResult = pollData.data?.runs?.['1']?.firstView;
+      if (!testResult) continue;
+
+      // Got results - map to BenchmarkResult
+      const perfScore = Math.round(testResult.score?.performance || 0);
+      const a11yScore = Math.round(testResult.score?.accessibility || 0);
+      const seoScore = Math.round(testResult.score?.seo || 0);
+      const bpScore = Math.round(testResult.score?.bestpractices || 0);
+
+      const lcpMs = testResult.metrics?.LargestContentfulPaint?.renderStart || 0;
+      const fcpMs = testResult.metrics?.FirstContentfulPaint?.start || 0;
+      const clsValue = 0;
+      const tbtMs = testResult.metrics?.TotalBlockingTime?.time || 0;
+      const siMs = testResult.metrics?.SpeedIndex?.time || 0;
+      const ttfbMs = testResult.metrics?.TTFB?.responseStart || 0;
+
+      const resources = (testResult.requests || []).map((r: any) => ({
+        url: r.url || '',
+        name: (r.url || '').split('/').pop() || '',
+        type: (r.type || 'other').toLowerCase(),
+        size: r.bytes || 0,
+        transferSize: r.bytes || 0,
+        duration: r.end - r.start || 0,
+        status: r.responseCode || 200,
+        priority: 'medium',
+        startTime: r.start || 0,
+        domain: (() => { try { return new URL(r.url || '').hostname; } catch { return ''; } })(),
+      }));
+
+      const totalTransfer = resources.reduce((s: number, r: any) => s + (r.transferSize || 0), 0);
+      const totalRequests = resources.length;
+
+      const result: BenchmarkResult = {
+        id: generateId(),
+        url,
+        hostname: getHostname(url),
+        timestamp: new Date().toISOString(),
+        device: strategy === 'mobile' ? 'mobile' : 'desktop',
+        connection: 'fast',
+        duration: Math.round(testResult.loadTime || 0),
+        scores: { performance: perfScore, accessibility: a11yScore, seo: seoScore, bestPractices: bpScore },
+        coreWebVitals: {
+          lcp: { value: Math.round(lcpMs), rating: getRating(lcpMs, 2500, 4000), unit: 'ms', threshold: { good: 2500, poor: 4000 }, description: 'Largest Contentful Paint', suggestion: 'Optimize the largest element load time.' },
+          inp: { value: Math.round(tbtMs), rating: getRating(tbtMs, 200, 500), unit: 'ms', threshold: { good: 200, poor: 500 }, description: 'Interaction to Next Paint', suggestion: 'Reduce main thread blocking time.' },
+          cls: { value: Math.round(clsValue * 1000) / 1000, rating: getRating(clsValue, 0.1, 0.25), unit: '', threshold: { good: 0.1, poor: 0.25 }, description: 'Cumulative Layout Shift', suggestion: 'Set explicit dimensions for elements.' },
+        },
+        supportingMetrics: {
+          fcp: { value: Math.round(fcpMs), rating: getRating(fcpMs, 1800, 3000), unit: 'ms', threshold: { good: 1800, poor: 3000 }, description: 'First Contentful Paint', suggestion: 'Reduce render-blocking resources.' },
+          ttfb: { value: Math.round(ttfbMs), rating: getRating(ttfbMs, 200, 600), unit: 'ms', threshold: { good: 200, poor: 600 }, description: 'Time to First Byte', suggestion: 'Improve server response time.' },
+          speedIndex: { value: Math.round(siMs), rating: getRating(siMs, 2000, 4000), unit: 'ms', threshold: { good: 2000, poor: 4000 }, description: 'Speed Index', suggestion: 'Optimize above-the-fold content.' },
+          totalBlockingTime: { value: Math.round(tbtMs), rating: getRating(tbtMs, 200, 600), unit: 'ms', threshold: { good: 200, poor: 600 }, description: 'Total Blocking Time', suggestion: 'Break up long tasks.' },
+        },
+        navigationTiming: {
+          dns: 0, connection: 0, tls: 0, request: 0, response: 0,
+          dom: testResult.domContentLoadedEventEnd || 0,
+          firstPaint: fcpMs, fcp: fcpMs, lcp: lcpMs,
+          load: testResult.loadTime || 0,
+          domContentLoaded: testResult.domContentLoadedEventEnd || 0,
+          domInteractive: testResult.domInteractive || 0,
+        },
+        resources: resources.slice(0, 50),
+        resourceBreakdown: {
+          totalSize: totalTransfer, totalTransferSize: totalTransfer, totalRequests,
+          javascript: { size: 0, transferSize: 0, requests: 0, blocking: 0, async: 0, deferred: 0 },
+          css: { size: 0, transferSize: 0, requests: 0 },
+          images: { size: 0, transferSize: 0, requests: 0, oversized: 0, missingDimensions: 0, unsupportedFormat: 0 },
+          fonts: { size: 0, transferSize: 0, requests: 0 },
+          html: { size: 0, transferSize: 0, requests: 0 },
+          xhrFetch: { size: 0, transferSize: 0, requests: 0 },
+          other: { size: 0, transferSize: 0, requests: 0 },
+        },
+        thirdParties: [],
+        accessibility: [], seo: [], bestPractices: [],
+        opportunities: [],
+        diagnostics: [
+          { id: 'total-byte-weight', title: 'Total page weight', value: totalTransfer, unit: 'bytes', status: totalTransfer < 1500000 ? 'good' : totalTransfer < 3000000 ? 'warning' : 'poor' },
+          { id: 'network-requests', title: 'Network requests', value: totalRequests, unit: 'requests', status: totalRequests < 40 ? 'good' : totalRequests < 65 ? 'warning' : 'poor' },
+        ],
+        javascriptAnalysis: { totalSize: 0, totalTransferSize: 0, scriptCount: 0, blockingScripts: 0, asyncScripts: 0, deferredScripts: 0, longTasks: 0, thirdPartyScripts: 0, executionTime: 0, mainThreadTime: 0 },
+        imageAnalysis: { oversized: [], missingDimensions: [], unsupportedFormat: [], lazyLoadOpportunities: [], responsiveOpportunities: [], recommendations: [] },
+        cachingAnalysis: { resourcesWithCaching: 0, resourcesWithoutCaching: 0, totalCacheableSize: 0, recommendations: [] },
+        compressionAnalysis: { compressedSize: 0, uncompressedSize: 0, potentialSavings: 0, resourcesCompressed: 0, resourcesUncompressed: 0, formats: [] },
+        securityAnalysis: { https: url.startsWith('https://'), mixedContent: false, consoleErrors: [], failedRequests: [], deprecatedAPIs: [], checks: [] },
+        waterfall: [],
+      };
+
+      console.log(`[WPT] Test completed for ${url}`);
+      return result;
+    }
+
+    console.log('[WPT] Test timed out waiting for results');
+    return null;
+  } catch (err: any) {
+    console.log(`[WPT] Fallback failed: ${err.message}`);
+    return null;
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -90,6 +227,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
+      // WebPageTest fallback
+      if (psiResponse.status === 429) {
+        const fallbackResult = await tryWebPageTestFallback(url, strategy);
+        if (fallbackResult) {
+          return res.status(200).json(fallbackResult);
+        }
+      }
       return res.status(psiResponse.status).json({ error: `PageSpeed API error: ${errText}` });
     }
 
