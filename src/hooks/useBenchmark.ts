@@ -50,12 +50,12 @@ export function useStartBenchmark() {
 
       const stages = [
         { progress: 10, stage: 'Sending URL to Google Lighthouse...' },
-        { progress: 25, stage: 'Loading page in headless browser...' },
-        { progress: 40, stage: 'Collecting performance metrics...' },
-        { progress: 55, stage: 'Running accessibility audits...' },
-        { progress: 70, stage: 'Analyzing SEO & best practices...' },
-        { progress: 85, stage: 'Processing network data...' },
-        { progress: 95, stage: 'Generating report...' },
+        { progress: 20, stage: 'Loading page in headless browser...' },
+        { progress: 35, stage: 'Collecting performance metrics...' },
+        { progress: 50, stage: 'Running accessibility audits...' },
+        { progress: 65, stage: 'Analyzing SEO & best practices...' },
+        { progress: 80, stage: 'Processing network data...' },
+        { progress: 90, stage: 'Generating report...' },
       ];
 
       let stageIdx = 0;
@@ -65,7 +65,7 @@ export function useStartBenchmark() {
           setState((prev) => ({ ...prev, ...stages[stageIdx] }));
           stageIdx++;
         }
-      }, 4000);
+      }, 5000);
 
       runBenchmark(url, device, connection)
         .then((result) => {

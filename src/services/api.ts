@@ -16,8 +16,19 @@ export async function runBenchmark(
   });
 
   if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`Benchmark failed (${res.status}): ${body || res.statusText}`);
+    let errorMsg = `Request failed (${res.status})`;
+    try {
+      const body = await res.json();
+      errorMsg = body.message || body.error || errorMsg;
+
+      if (res.status === 429) {
+        errorMsg = body.message || 'Rate limited by Google. Please wait a few minutes and try again. For higher limits, add a GOOGLE_PSI_API_KEY environment variable.';
+      }
+    } catch {
+      const body = await res.text().catch(() => '');
+      if (body) errorMsg = body;
+    }
+    throw new Error(errorMsg);
   }
 
   return res.json() as Promise<BenchmarkResult>;

@@ -1,6 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { BenchmarkResult, DeviceType } from '../src/types/index';
 
+const PSI_BASE = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+const MAX_RETRIES = 3;
+const RETRY_DELAYS = [5000, 10000, 20000];
+
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
 }
@@ -33,6 +37,23 @@ function mapAudits(audits: any, category: string): Array<{id: string; title: str
     }));
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Response> {
+  const response = await fetch(url);
+
+  if (response.status === 429 && retries > 0) {
+    const delay = RETRY_DELAYS[MAX_RETRIES - retries];
+    console.log(`[PSI] Rate limited (429). Retrying in ${delay / 1000}s... (${retries} retries left)`);
+    await sleep(delay);
+    return fetchWithRetry(url, retries - 1);
+  }
+
+  return response;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -47,12 +68,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try { new URL(url); } catch { return res.status(400).json({ error: 'Invalid URL' }); }
 
   const strategy = device === 'mobile' ? 'mobile' : 'desktop';
-  const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&category=performance&category=accessibility&category=seo&category=best-practices`;
+  const apiKey = process.env.GOOGLE_PSI_API_KEY || process.env.PSI_API_KEY || '';
+  const keyParam = apiKey ? `&key=${apiKey}` : '';
+  const apiUrl = `${PSI_BASE}?url=${encodeURIComponent(url)}&strategy=${strategy}&category=performance&category=accessibility&category=seo&category=best-practices${keyParam}`;
 
   try {
-    const psiResponse = await fetch(apiUrl);
+    console.log(`[PSI] Analyzing ${url} (${strategy})${apiKey ? ' with API key' : ' without API key (rate limited)'}`);
+
+    const psiResponse = await fetchWithRetry(apiUrl);
+
     if (!psiResponse.ok) {
-      const errText = await psiResponse.text();
+      const errText = await psiResponse.text().catch(() => '');
+
+      if (psiResponse.status === 429) {
+        return res.status(429).json({
+          error: 'Rate limited by Google PageSpeed Insights API.',
+          message: apiKey
+            ? 'API key quota exceeded. Please wait a few minutes and try again.'
+            : 'Too many requests without an API key. Add a GOOGLE_PSI_API_KEY environment variable for higher limits (free, 250k requests/day).',
+          hint: 'Get a free API key at: https://console.cloud.google.com/apis/credentials',
+        });
+      }
+
       return res.status(psiResponse.status).json({ error: `PageSpeed API error: ${errText}` });
     }
 
@@ -222,7 +259,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json(result);
   } catch (err: any) {
-    console.error('PSI API error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to run PageSpeed analysis' });
+    console.error('[PSI] Error:', err.message);
+
+    if (err.message?.includes('fetch failed') || err.message?.includes('ECONNREFUSED')) {
+      return res.status(502).json({ error: 'Could not reach Google PageSpeed Insights API. Check your network connection.' });
+    }
+
+    return res.status(500).json({
+      error: 'Failed to run PageSpeed analysis.',
+      message: err.message || 'Unknown error',
+    });
   }
 }
