@@ -177,7 +177,7 @@ export default function History() {
               <button
                 onClick={handleCompare}
                 disabled={selectedIds.length !== 2}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
               >
                 Compare Selected ({selectedIds.length}/2)
               </button>
@@ -275,7 +275,7 @@ export default function History() {
               type="checkbox"
               checked={allSelected}
               onChange={handleSelectAll}
-              className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500/30"
+              className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-teal-500 focus:ring-teal-500/30"
             />
             <span className="text-sm text-gray-400">Select All (page)</span>
           </label>
@@ -339,7 +339,7 @@ export default function History() {
                       onClick={() => setCurrentPage(item)}
                       className={`w-9 h-9 text-sm rounded-md transition-colors ${
                         currentPage === item
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-teal-600 text-white'
                           : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'
                       }`}
                       aria-current={currentPage === item ? 'page' : undefined}

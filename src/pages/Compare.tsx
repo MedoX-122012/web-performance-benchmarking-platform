@@ -79,7 +79,7 @@ function ReportSelector({ label, value, entries, onSelect, report, isLoading }: 
 
       {isLoading && (
         <div className="flex items-center justify-center py-8">
-          <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
@@ -314,7 +314,7 @@ export default function Compare() {
 
       {bothLoading && (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 

@@ -82,7 +82,7 @@ function TabFallback() {
   return (
     <div className="flex items-center justify-center py-16">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-teal-500 border-t-transparent rounded-full animate-spin" />
         <span className="text-sm text-gray-500">Loading tab content...</span>
       </div>
     </div>
@@ -299,8 +299,8 @@ function JavaScriptAnalysisSection({ analysis, resources }: { analysis: JavaScri
           <div className="text-xs text-gray-500">Non-blocking async loading</div>
         </div>
         <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-          <div className="text-xs text-blue-400 font-medium mb-1">Deferred Scripts</div>
-          <div className="text-xl font-bold text-blue-400 font-mono">{analysis.deferredScripts}</div>
+          <div className="text-xs text-sky-400 font-medium mb-1">Deferred Scripts</div>
+          <div className="text-xl font-bold text-sky-400 font-mono">{analysis.deferredScripts}</div>
           <div className="text-xs text-gray-500">Deferred until DOM ready</div>
         </div>
       </div>
@@ -467,7 +467,7 @@ function CompressionAnalysisSection({ analysis }: { analysis: CompressionAnalysi
 
       <div className="h-3 bg-gray-800 rounded-full overflow-hidden mb-5">
         <div
-          className="h-full bg-blue-500 rounded-full transition-all duration-500"
+          className="h-full bg-teal-500 rounded-full transition-all duration-500"
           style={{ width: `${compressedPercent}%` }}
         />
       </div>
@@ -477,7 +477,7 @@ function CompressionAnalysisSection({ analysis }: { analysis: CompressionAnalysi
           <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Compression Formats Detected</h4>
           <div className="flex flex-wrap gap-2">
             {analysis.formats.map((fmt) => (
-              <span key={fmt} className="px-3 py-1 bg-blue-500/15 text-blue-400 text-xs font-medium rounded-full">
+              <span key={fmt} className="px-3 py-1 bg-teal-500/15 text-teal-400 text-xs font-medium rounded-full">
                 {fmt}
               </span>
             ))}
@@ -876,7 +876,7 @@ function ComparisonModal({
                   className={clsx(
                     'w-full text-left p-3 rounded-lg border transition-colors',
                     selectedId === entry.id
-                      ? 'bg-blue-500/15 border-blue-500/30'
+                      ? 'bg-teal-500/15 border-teal-500/30'
                       : 'bg-gray-800/30 border-gray-700/50 hover:bg-gray-800/50',
                   )}
                 >
@@ -901,7 +901,7 @@ function ComparisonModal({
 
           {selectedId && loadingPrev && (
             <div className="flex items-center justify-center py-8">
-              <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
             </div>
           )}
         </div>
@@ -1049,7 +1049,7 @@ export default function Report() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-gray-400">Loading report...</p>
         </div>
       </div>
@@ -1067,7 +1067,7 @@ export default function Report() {
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm font-medium transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -1170,7 +1170,7 @@ export default function Report() {
               className={clsx(
                 'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 flex-shrink-0',
                 activeTab === tab.id
-                  ? 'text-blue-400 border-blue-400 bg-blue-500/5'
+                  ? 'text-teal-400 border-teal-400 bg-teal-500/5'
                   : 'text-gray-500 border-transparent hover:text-gray-300 hover:bg-gray-800/50',
               )}
             >

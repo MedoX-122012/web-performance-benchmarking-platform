@@ -127,7 +127,7 @@ export default function ComparisonTable({ previous, current }: ComparisonTablePr
               </th>
               <th className="text-right py-3 px-5 text-xs font-medium text-gray-400 w-1/4">
                 <div className="flex items-center justify-end gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
                   Current
                 </div>
               </th>
@@ -175,7 +175,7 @@ export default function ComparisonTable({ previous, current }: ComparisonTablePr
           </div>
           <div className="text-gray-700">→</div>
           <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
             {current.hostname} · {new Date(current.timestamp).toLocaleDateString()}
           </div>
         </div>

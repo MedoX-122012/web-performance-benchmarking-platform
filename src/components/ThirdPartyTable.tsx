@@ -10,17 +10,17 @@ type SortKey = 'domain' | 'requests' | 'transferSize' | 'mainThreadTime';
 type SortDir = 'asc' | 'desc';
 
 const CATEGORY_COLORS: Record<ThirdPartyDomain['category'], { bg: string; text: string }> = {
-  analytics: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  advertising: { bg: 'bg-red-500/20', text: 'text-red-400' },
-  social: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
-  fonts: { bg: 'bg-green-500/20', text: 'text-green-400' },
-  cdn: { bg: 'bg-cyan-500/20', text: 'text-cyan-400' },
+  analytics: { bg: 'bg-sky-500/20', text: 'text-sky-400' },
+  advertising: { bg: 'bg-rose-500/20', text: 'text-rose-400' },
+  social: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
+  fonts: { bg: 'bg-emerald-500/20', text: 'text-emerald-400' },
+  cdn: { bg: 'bg-teal-500/20', text: 'text-teal-400' },
   other: { bg: 'bg-gray-500/20', text: 'text-gray-400' },
 };
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active) return <span className="text-gray-600 ml-1">↕</span>;
-  return <span className="text-blue-400 ml-1">{dir === 'asc' ? '↑' : '↓'}</span>;
+  return <span className="text-teal-400 ml-1">{dir === 'asc' ? '↑' : '↓'}</span>;
 }
 
 export default function ThirdPartyTable({ domains }: ThirdPartyTableProps) {

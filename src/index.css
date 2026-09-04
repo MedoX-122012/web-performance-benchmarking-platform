@@ -90,37 +90,37 @@ fieldset {
 
 :root {
   /* ---------- Colors: Backgrounds ---------- */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-card: #1a1a2e;
-  --bg-hover: #222240;
+  --bg-primary: #0c0f14;
+  --bg-secondary: #111520;
+  --bg-card: #171c28;
+  --bg-hover: #1e2536;
 
   /* ---------- Colors: Text ---------- */
-  --text-primary: #e8e8f0;
-  --text-secondary: #8888aa;
-  --text-muted: #555577;
+  --text-primary: #dfe6ef;
+  --text-secondary: #7e8da0;
+  --text-muted: #4d5b6e;
 
   /* ---------- Colors: Accent ---------- */
-  --color-primary: #6366f1;
-  --color-primary-hover: #818cf8;
-  --color-success: #22c55e;
+  --color-primary: #0ea5a0;
+  --color-primary-hover: #14c9c2;
+  --color-success: #34d399;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-info: #38bdf8;
 
   /* ---------- Score Colors ---------- */
-  --score-good: #22c55e;
-  --score-medium: #f59e0b;
-  --score-poor: #ef4444;
+  --score-good: #34d399;
+  --score-medium: #fbbf24;
+  --score-poor: #f87171;
 
   /* ---------- Borders ---------- */
-  --border-color: #2a2a40;
-  --border-color-light: #3a3a55;
+  --border-color: #232b3a;
+  --border-color-light: #2e3a4e;
 
   /* ---------- Shadows ---------- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
 
   /* ---------- Spacing ---------- */
   --space-xs: 0.25rem;
