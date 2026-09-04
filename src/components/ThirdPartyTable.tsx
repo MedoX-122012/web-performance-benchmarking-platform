@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import type { ThirdPartyDomain } from '@/types';
-import { formatBytes } from '@/utils/formatting';
+import type { ThirdPartyDomain } from '@types/index';
+import { formatBytes } from '@utils/formatting';
 
 interface ThirdPartyTableProps {
   domains: ThirdPartyDomain[];
@@ -10,17 +10,17 @@ type SortKey = 'domain' | 'requests' | 'transferSize' | 'mainThreadTime';
 type SortDir = 'asc' | 'desc';
 
 const CATEGORY_COLORS: Record<ThirdPartyDomain['category'], { bg: string; text: string }> = {
-  analytics: { bg: 'bg-sky-500/20', text: 'text-sky-400' },
-  advertising: { bg: 'bg-rose-500/20', text: 'text-rose-400' },
-  social: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
-  fonts: { bg: 'bg-emerald-500/20', text: 'text-emerald-400' },
-  cdn: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  other: { bg: 'bg-gray-500/20', text: 'text-gray-400' },
+  analytics: { bg: 'rgba(99, 179, 237, 0.2)', text: '#63B3ED' },
+  advertising: { bg: 'rgba(252, 129, 129, 0.2)', text: '#FC8181' },
+  social: { bg: 'rgba(237, 184, 113, 0.2)', text: '#EDB871' },
+  fonts: { bg: 'rgba(72, 187, 120, 0.2)', text: '#48BB78' },
+  cdn: { bg: 'rgba(90, 150, 200, 0.2)', text: '#5A96C8' },
+  other: { bg: 'var(--bg-hover)', text: 'var(--text-muted)' },
 };
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active) return <span className="text-gray-600 ml-1">↕</span>;
-  return <span className="text-blue-400 ml-1">{dir === 'asc' ? '↑' : '↓'}</span>;
+  if (!active) return <span style={{ color: 'var(--text-muted)', marginLeft: 4 }}>↕</span>;
+  return <span style={{ color: 'var(--color-primary)', marginLeft: 4 }}>{dir === 'asc' ? '↑' : '↓'}</span>;
 }
 
 export default function ThirdPartyTable({ domains }: ThirdPartyTableProps) {
@@ -71,31 +71,31 @@ export default function ThirdPartyTable({ domains }: ThirdPartyTableProps) {
 
   if (domains.length === 0) {
     return (
-      <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
-        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-3">
+      <div style={{ backgroundColor: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-lg)', border: '1px solid var(--border-color)' }}>
+        <h3 style={{ fontSize: 'var(--font-sm)', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
           Third-Party Domains
         </h3>
-        <p className="text-sm text-gray-500">No third-party domains detected.</p>
+        <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-muted)' }}>No third-party domains detected.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
-      <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+    <div style={{ backgroundColor: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-lg)', border: '1px solid var(--border-color)' }}>
+      <h3 style={{ fontSize: 'var(--font-sm)', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 16 }}>
         Third-Party Domains
       </h3>
 
-      <div className="flex gap-6 mb-5">
-        <div className="flex flex-wrap gap-3">
+      <div style={{ display: 'flex', gap: 24, marginBottom: 20 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
           {categoryBreakdown.map(([cat, data]) => {
             const colors = CATEGORY_COLORS[cat as ThirdPartyDomain['category']] || CATEGORY_COLORS.other;
             return (
-              <div key={cat} className="flex items-center gap-2">
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
+              <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-xs)', fontWeight: 500, backgroundColor: colors.bg, color: colors.text }}>
                   {cat}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>
                   {data.count} domain{data.count !== 1 ? 's' : ''} · {formatBytes(data.transferSize)}
                 </span>
               </div>
@@ -104,10 +104,10 @@ export default function ThirdPartyTable({ domains }: ThirdPartyTableProps) {
         </div>
       </div>
 
-      <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm min-w-[600px]">
+      <div style={{ overflowX: 'auto', margin: '0 -20px', padding: '0 20px' }}>
+        <table style={{ width: '100%', fontSize: 'var(--font-sm)', minWidth: 600 }}>
           <thead>
-            <tr className="border-b border-gray-800">
+            <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
               {[
                 { key: 'domain' as SortKey, label: 'Domain' },
                 { key: 'requests' as SortKey, label: 'Requests' },
@@ -116,27 +116,27 @@ export default function ThirdPartyTable({ domains }: ThirdPartyTableProps) {
               ].map(({ key, label }) => (
                 <th
                   key={key}
-                  className="text-left py-2.5 px-3 text-xs font-medium text-gray-400 cursor-pointer hover:text-gray-200 select-none"
+                  style={{ textAlign: 'left', padding: '10px 12px', fontSize: 'var(--font-xs)', fontWeight: 500, color: 'var(--text-muted)', cursor: 'pointer', userSelect: 'none' }}
                   onClick={() => handleSort(key)}
                 >
                   {label}
                   <SortIcon active={sortKey === key} dir={sortDir} />
                 </th>
               ))}
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-gray-400">Category</th>
+              <th style={{ textAlign: 'left', padding: '10px 12px', fontSize: 'var(--font-xs)', fontWeight: 500, color: 'var(--text-muted)' }}>Category</th>
             </tr>
           </thead>
           <tbody>
             {sorted.map((d) => {
               const colors = CATEGORY_COLORS[d.category] || CATEGORY_COLORS.other;
               return (
-                <tr key={d.domain} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
-                  <td className="py-2.5 px-3 text-gray-200 font-mono text-xs">{d.domain}</td>
-                  <td className="py-2.5 px-3 text-gray-300 tabular-nums">{d.requests}</td>
-                  <td className="py-2.5 px-3 text-gray-300 tabular-nums">{formatBytes(d.transferSize)}</td>
-                  <td className="py-2.5 px-3 text-gray-300 tabular-nums">{d.mainThreadTime}ms</td>
-                  <td className="py-2.5 px-3">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
+                <tr key={d.domain} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 150ms ease' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-primary)', fontFamily: '"SF Mono", "Fira Code", monospace', fontSize: 'var(--font-xs)' }}>{d.domain}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{d.requests}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{formatBytes(d.transferSize)}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{d.mainThreadTime}ms</td>
+                  <td style={{ padding: '10px 12px' }}>
+                    <span style={{ padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-xs)', fontWeight: 500, backgroundColor: colors.bg, color: colors.text }}>
                       {d.category}
                     </span>
                   </td>
@@ -145,11 +145,11 @@ export default function ThirdPartyTable({ domains }: ThirdPartyTableProps) {
             })}
           </tbody>
           <tfoot>
-            <tr className="border-t border-gray-700 font-medium">
-              <td className="py-2.5 px-3 text-gray-300">Total</td>
-              <td className="py-2.5 px-3 text-gray-300 tabular-nums">{totals.requests}</td>
-              <td className="py-2.5 px-3 text-gray-300 tabular-nums">{formatBytes(totals.transferSize)}</td>
-              <td className="py-2.5 px-3 text-gray-300 tabular-nums">{totals.mainThreadTime}ms</td>
+            <tr style={{ borderTop: '1px solid var(--border-color)', fontWeight: 500 }}>
+              <td style={{ padding: '10px 12px', color: 'var(--text-secondary)' }}>Total</td>
+              <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{totals.requests}</td>
+              <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{formatBytes(totals.transferSize)}</td>
+              <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{totals.mainThreadTime}ms</td>
               <td />
             </tr>
           </tfoot>

@@ -90,37 +90,37 @@ fieldset {
 
 :root {
   /* ---------- Colors: Backgrounds ---------- */
-  --bg-primary: #0d1117;
-  --bg-secondary: #161b22;
-  --bg-card: #1c2128;
-  --bg-hover: #21262d;
+  --bg-primary: #F7F8FA;
+  --bg-secondary: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F1F3F5;
 
   /* ---------- Colors: Text ---------- */
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --text-muted: #484f58;
+  --text-primary: #20242A;
+  --text-secondary: #66707A;
+  --text-muted: #9CA3AF;
 
   /* ---------- Colors: Accent ---------- */
-  --color-primary: #58a6ff;
-  --color-primary-hover: #79c0ff;
-  --color-success: #3fb950;
-  --color-warning: #d29922;
-  --color-error: #f85149;
-  --color-info: #79c0ff;
+  --color-primary: #3B6EA8;
+  --color-primary-hover: #2D5A8A;
+  --color-success: #3E8E6B;
+  --color-warning: #B98232;
+  --color-error: #B65353;
+  --color-info: #3B6EA8;
 
   /* ---------- Score Colors ---------- */
-  --score-good: #3fb950;
-  --score-medium: #d29922;
-  --score-poor: #f85149;
+  --score-good: #3E8E6B;
+  --score-medium: #B98232;
+  --score-poor: #B65353;
 
   /* ---------- Borders ---------- */
-  --border-color: #30363d;
-  --border-color-light: #3d444d;
+  --border-color: #E2E5E9;
+  --border-color-light: #ECEEF1;
 
   /* ---------- Shadows ---------- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
 
   /* ---------- Spacing ---------- */
   --space-xs: 0.25rem;
@@ -132,27 +132,27 @@ fieldset {
   --space-3xl: 4rem;
 
   /* ---------- Border Radius ---------- */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
   --radius-full: 9999px;
 
   /* ---------- Font Sizes ---------- */
   --font-xs: 0.75rem;
-  --font-sm: 0.875rem;
-  --font-base: 1rem;
-  --font-lg: 1.125rem;
-  --font-xl: 1.25rem;
-  --font-2xl: 1.5rem;
-  --font-3xl: 1.875rem;
-  --font-4xl: 2.25rem;
+  --font-sm: 0.8125rem;
+  --font-base: 0.9375rem;
+  --font-lg: 1.0625rem;
+  --font-xl: 1.1875rem;
+  --font-2xl: 1.375rem;
+  --font-3xl: 1.75rem;
+  --font-4xl: 2.125rem;
 
   /* ---------- Transitions ---------- */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 400ms ease;
+  --transition-fast: 120ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
 
   /* ---------- Z-Index ---------- */
   --z-dropdown: 100;
@@ -160,6 +160,41 @@ fieldset {
   --z-overlay: 300;
   --z-modal: 400;
   --z-toast: 500;
+}
+
+/* ==========================================================================
+   Dark Mode
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #17191C;
+    --bg-secondary: #202327;
+    --bg-card: #202327;
+    --bg-hover: #292D32;
+
+    --text-primary: #E7E9EC;
+    --text-secondary: #9BA2AA;
+    --text-muted: #6B7280;
+
+    --color-primary: #6F9BC8;
+    --color-primary-hover: #8DB3DA;
+    --color-success: #68A98A;
+    --color-warning: #C59A58;
+    --color-error: #C97878;
+    --color-info: #6F9BC8;
+
+    --score-good: #68A98A;
+    --score-medium: #C59A58;
+    --score-poor: #C97878;
+
+    --border-color: #343940;
+    --border-color-light: #3D4249;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  }
 }
 
 /* ==========================================================================
@@ -274,7 +309,7 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(59, 110, 168, 0.15);
 }
 
 input::placeholder,
@@ -289,7 +324,7 @@ hr {
 }
 
 ::selection {
-  background-color: rgba(88, 166, 255, 0.3);
+  background-color: rgba(59, 110, 168, 0.2);
   color: var(--text-primary);
 }
 

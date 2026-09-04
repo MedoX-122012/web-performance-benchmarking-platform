@@ -1,12 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TestHistoryCard from '@/components/TestHistoryCard';
+import TestHistoryCard from '@components/TestHistoryCard';
 import {
   getHistory as getLocalHistory,
   deleteHistoryEntry,
   clearAllHistory,
-} from '@/utils/storage';
-import type { DeviceType, HistoryEntry } from '@/types';
+} from '@utils/storage';
+import type { DeviceType, HistoryEntry } from '@types/index';
 
 const PAGE_SIZE = 12;
 

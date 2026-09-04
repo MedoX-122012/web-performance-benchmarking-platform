@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import ComparisonTable from '@/components/ComparisonTable';
-import ScoreCircle from '@/components/ScoreCircle';
-import { formatBytes, formatDuration } from '@/utils/formatting';
-import { getHistory as getLocalHistory, getFullResult } from '@/utils/storage';
-import type { BenchmarkResult, HistoryEntry } from '@/types';
+import ComparisonTable from '@components/ComparisonTable';
+import ScoreCircle from '@components/ScoreCircle';
+import { formatBytes, formatDuration } from '@utils/formatting';
+import { getHistory as getLocalHistory, getFullResult } from '@utils/storage';
+import type { BenchmarkResult, HistoryEntry } from '@types/index';
 
 interface ReportSelectorProps {
   label: string;

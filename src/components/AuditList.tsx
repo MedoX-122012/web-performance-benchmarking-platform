@@ -1,157 +1,49 @@
-import { useState, useMemo } from 'react';
-import type { AccessibilityAudit, SEOAudit, BestPracticeAudit } from '@/types';
+interface Audit {
+  id: string;
+  title: string;
+  description: string;
+  status: 'passed' | 'warning' | 'failed';
+  severity?: string;
+  impact?: string;
+}
 
 interface AuditListProps {
-  audits: Array<AccessibilityAudit | SEOAudit | BestPracticeAudit>;
-  type: 'accessibility' | 'seo' | 'bestPractices';
+  title: string;
+  audits: Audit[];
+  type?: 'accessibility' | 'seo' | 'best-practices';
 }
 
-type Status = 'passed' | 'warning' | 'failed';
-
-const STATUS_CONFIG: Record<Status, { label: string; bg: string; text: string; icon: string }> = {
-  passed: { label: 'Passed', bg: 'bg-green-500/20', text: 'text-green-400', icon: '✓' },
-  warning: { label: 'Warning', bg: 'bg-yellow-500/20', text: 'text-yellow-400', icon: '⚠' },
-  failed: { label: 'Failed', bg: 'bg-red-500/20', text: 'text-red-400', icon: '✕' },
-};
-
-function getImpactConfig(impact: string) {
-  const map: Record<string, { label: string; bg: string; text: string }> = {
-    critical: { label: 'Critical', bg: 'bg-red-500/20', text: 'text-red-400' },
-    serious: { label: 'Serious', bg: 'bg-orange-500/20', text: 'text-orange-400' },
-    moderate: { label: 'Moderate', bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
-    minor: { label: 'Minor', bg: 'bg-gray-500/20', text: 'text-gray-400' },
-  };
-  return map[impact] || map.minor;
+function getStatusIcon(status: string): { color: string; symbol: string } {
+  if (status === 'passed') return { color: 'var(--score-good)', symbol: '\u2713' };
+  if (status === 'warning') return { color: 'var(--score-medium)', symbol: '!' };
+  return { color: 'var(--score-poor)', symbol: '\u2717' };
 }
 
-function hasImpact(audit: AccessibilityAudit | SEOAudit | BestPracticeAudit): audit is AccessibilityAudit {
-  return 'impact' in audit;
-}
-
-function hasSeverity(audit: AccessibilityAudit | SEOAudit | BestPracticeAudit): audit is BestPracticeAudit {
-  return 'severity' in audit;
-}
-
-function getAuditDetails(audit: AccessibilityAudit | SEOAudit | BestPracticeAudit) {
-  if (hasImpact(audit)) return audit.details;
-  if (hasSeverity(audit)) return audit.details;
-  return (audit as SEOAudit).details;
-}
-
-function getFixSuggestion(audit: AccessibilityAudit | SEOAudit | BestPracticeAudit) {
-  if (hasImpact(audit)) return audit.howToFix;
-  if (hasSeverity(audit)) return undefined;
-  return (audit as SEOAudit).recommendation;
-}
-
-export default function AuditList({ audits, type }: AuditListProps) {
-  const [filter, setFilter] = useState<Status | 'all'>('all');
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-
-  const grouped = useMemo(() => {
-    const groups: Record<Status, typeof audits> = {
-      passed: [],
-      warning: [],
-      failed: [],
-    };
-    for (const a of audits) {
-      groups[a.status].push(a);
-    }
-    return groups;
-  }, [audits]);
-
-  const filteredAudits = useMemo(() => {
-    if (filter === 'all') return audits;
-    return grouped[filter];
-  }, [audits, filter, grouped]);
-
-  const toggle = (id: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+export default function AuditList({ title, audits }: AuditListProps) {
+  const passed = audits.filter(a => a.status === 'passed').length;
+  const failed = audits.filter(a => a.status === 'failed').length;
+  const warnings = audits.filter(a => a.status === 'warning').length;
 
   return (
-    <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
-          {type === 'accessibility' ? 'Accessibility' : type === 'seo' ? 'SEO' : 'Best Practices'} Audits
-        </h3>
-        <div className="flex gap-2">
-          {(['all', 'passed', 'warning', 'failed'] as const).map((s) => {
-            const cfg = s === 'all' ? { label: 'All', bg: 'bg-gray-700/50', text: 'text-gray-300' } : STATUS_CONFIG[s];
-            const count = s === 'all' ? audits.length : grouped[s].length;
-            return (
-              <button
-                key={s}
-                onClick={() => setFilter(s)}
-                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                  filter === s ? `${cfg.bg} ${cfg.text} ring-1 ring-white/10` : 'text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                {cfg.label}
-                <span className="ml-1.5 text-[10px] opacity-70">{count}</span>
-              </button>
-            );
-          })}
+    <div style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+      <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h3 style={{ fontSize: 'var(--font-sm)', fontWeight: 600, color: 'var(--text-primary)' }}>{title}</h3>
+        <div style={{ display: 'flex', gap: 8, fontSize: 'var(--font-xs)' }}>
+          {passed > 0 && <span style={{ color: 'var(--score-good)' }}>{passed} passed</span>}
+          {warnings > 0 && <span style={{ color: 'var(--score-medium)' }}>{warnings} warnings</span>}
+          {failed > 0 && <span style={{ color: 'var(--score-poor)' }}>{failed} failed</span>}
         </div>
       </div>
-
-      <div className="space-y-1.5">
-        {filteredAudits.length === 0 && (
-          <p className="text-sm text-gray-500 py-4 text-center">No audits match this filter.</p>
-        )}
-        {filteredAudits.map((audit) => {
-          const cfg = STATUS_CONFIG[audit.status];
-          const isExpanded = expanded.has(audit.id);
-          const impact = hasImpact(audit) ? getImpactConfig(audit.impact) : null;
-          const details = getAuditDetails(audit);
-          const fix = getFixSuggestion(audit);
-
+      <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+        {audits.map((audit) => {
+          const { color, symbol } = getStatusIcon(audit.status);
           return (
-            <div key={audit.id} className="rounded-lg border border-gray-800/50 overflow-hidden">
-              <button
-                onClick={() => toggle(audit.id)}
-                className="w-full flex items-start gap-3 p-3 text-left hover:bg-gray-800/30 transition-colors"
-              >
-                <span className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${cfg.bg} ${cfg.text}`}>
-                  {cfg.icon}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm text-gray-200 font-medium">{audit.title}</span>
-                    {impact && (
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${impact.bg} ${impact.text}`}>
-                        {impact.label}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{audit.description}</p>
-                </div>
-                <span className="text-gray-600 text-xs flex-shrink-0 mt-1">{isExpanded ? '−' : '+'}</span>
-              </button>
-
-              {isExpanded && (details || fix) && (
-                <div className="px-3 pb-3 pt-0 ml-8 space-y-2">
-                  {details && (
-                    <div>
-                      <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">Details</p>
-                      <p className="text-xs text-gray-400 leading-relaxed">{details}</p>
-                    </div>
-                  )}
-                  {fix && (
-                    <div>
-                      <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">
-                        {type === 'seo' ? 'Recommendation' : 'How to Fix'}
-                      </p>
-                      <p className="text-xs text-gray-400 leading-relaxed">{fix}</p>
-                    </div>
-                  )}
-                </div>
-              )}
+            <div key={audit.id} style={{ padding: '0.5rem 1rem', borderBottom: '1px solid var(--border-color-light, var(--border-color))', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <span style={{ color, fontSize: '0.8125rem', fontWeight: 600, marginTop: 1, flexShrink: 0 }}>{symbol}</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 'var(--font-sm)', color: 'var(--text-primary)', fontWeight: 500 }}>{audit.title}</div>
+                <div style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)', marginTop: 2, lineHeight: 1.4 }}>{audit.description}</div>
+              </div>
             </div>
           );
         })}

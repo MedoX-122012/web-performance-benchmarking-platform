@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getHistory,
   getHistoryById,
-  getHistoryForUrl,
   deleteHistoryEntry,
   clearAllHistory,
 } from '@utils/storage';
@@ -21,14 +20,6 @@ export function useGetHistoryById(id: string | null) {
     queryKey: ['history', id],
     queryFn: () => (id ? getHistoryById(id) : null),
     enabled: !!id,
-  });
-}
-
-export function useGetHistoryByUrl(url: string | null) {
-  return useQuery<HistoryEntry[]>({
-    queryKey: ['history', 'url', url],
-    queryFn: () => (url ? getHistoryForUrl(url) : []),
-    enabled: !!url && url.length > 0,
   });
 }
 

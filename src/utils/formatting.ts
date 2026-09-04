@@ -17,9 +17,9 @@ export function formatScore(score: number): string {
 }
 
 export function getScoreColor(score: number): string {
-  if (score >= 90) return '#22c55e';
-  if (score >= 50) return '#eab308';
-  return '#ef4444';
+  if (score >= 90) return '#3E8E6B';
+  if (score >= 50) return '#B98232';
+  return '#B65353';
 }
 
 export function getScoreLabel(score: number): 'Good' | 'Needs Work' | 'Poor' {

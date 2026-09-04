@@ -1,16 +1,11 @@
-import { useCallback, useRef, useState } from 'react';
-import { fetchBenchmark, getJobStatus, subscribeToProgress } from '@/services/api';
-import type {
-  BenchmarkResult,
-  DeviceType,
-  ConnectionProfile,
-} from '@types/index';
+import { useCallback, useState } from 'react';
+import { runBenchmark } from '@/services/api';
+import type { BenchmarkResult, DeviceType, ConnectionProfile } from '@types/index';
 
 export type JobPhase = 'idle' | 'submitting' | 'running' | 'completed' | 'failed' | 'cancelled';
 
 interface BenchmarkState {
   phase: JobPhase;
-  jobId: string | null;
   progress: number;
   stage: string;
   result: BenchmarkResult | null;
@@ -19,7 +14,6 @@ interface BenchmarkState {
 
 const initialState: BenchmarkState = {
   phase: 'idle',
-  jobId: null,
   progress: 0,
   stage: '',
   result: null,
@@ -28,130 +22,67 @@ const initialState: BenchmarkState = {
 
 export function useStartBenchmark() {
   const [state, setState] = useState<BenchmarkState>(initialState);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
-
-  const cleanup = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-  }, []);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   const reset = useCallback(() => {
-    cleanup();
+    abortController?.abort();
+    setAbortController(null);
     setState(initialState);
-  }, [cleanup]);
+  }, [abortController]);
 
   const cancel = useCallback(() => {
-    cleanup();
+    abortController?.abort();
+    setAbortController(null);
     setState((prev) => ({
       ...prev,
       phase: 'cancelled',
       error: 'Cancelled by user',
     }));
-  }, [cleanup]);
+  }, [abortController]);
 
   const startBenchmark = useCallback(
-    (
-      url: string,
-      device: DeviceType,
-      connection: ConnectionProfile,
-    ) => {
-      cleanup();
-      setState({ ...initialState, phase: 'submitting' });
+    (url: string, device: DeviceType, connection: ConnectionProfile) => {
+      abortController?.abort();
+      const controller = new AbortController();
+      setAbortController(controller);
 
-      fetchBenchmark(url, device, connection)
-        .then(({ jobId }) => {
-          setState((prev) => ({
-            ...prev,
-            phase: 'running',
-            jobId,
-            progress: 10,
-            stage: 'Benchmark started',
-          }));
+      setState({ ...initialState, phase: 'submitting', progress: 5, stage: 'Connecting to PageSpeed Insights...' });
 
-          // Subscribe to progress events
-          const es = subscribeToProgress(jobId, (event) => {
-            try {
-              const data = JSON.parse(event.data);
-              setState((prev) => ({
-                ...prev,
-                progress: data.progress || prev.progress,
-                stage: data.stage || prev.stage,
-              }));
+      const stages = [
+        { progress: 10, stage: 'Sending URL to Google Lighthouse...' },
+        { progress: 25, stage: 'Loading page in headless browser...' },
+        { progress: 40, stage: 'Collecting performance metrics...' },
+        { progress: 55, stage: 'Running accessibility audits...' },
+        { progress: 70, stage: 'Analyzing SEO & best practices...' },
+        { progress: 85, stage: 'Processing network data...' },
+        { progress: 95, stage: 'Generating report...' },
+      ];
 
-              if (data.progress >= 100) {
-                es.close();
-                eventSourceRef.current = null;
-              }
-            } catch {
-              // Ignore parse errors
-            }
-          });
-          eventSourceRef.current = es;
+      let stageIdx = 0;
+      const interval = setInterval(() => {
+        if (controller.signal.aborted) { clearInterval(interval); return; }
+        if (stageIdx < stages.length) {
+          setState((prev) => ({ ...prev, ...stages[stageIdx] }));
+          stageIdx++;
+        }
+      }, 4000);
 
-          // Poll for job status
-          intervalRef.current = setInterval(async () => {
-            try {
-              const job = await getJobStatus(jobId);
-
-              if (job.status === 'completed' && job.result) {
-                cleanup();
-                setState({
-                  phase: 'completed',
-                  jobId,
-                  progress: 100,
-                  stage: 'Complete',
-                  result: job.result,
-                  error: null,
-                });
-              } else if (job.status === 'failed') {
-                cleanup();
-                setState({
-                  phase: 'failed',
-                  jobId,
-                  progress: 0,
-                  stage: '',
-                  result: null,
-                  error: job.error || 'Benchmark failed',
-                });
-              } else {
-                // Update progress from polling
-                setState((prev) => ({
-                  ...prev,
-                  progress: job.progress || prev.progress,
-                  stage: job.stage || prev.stage,
-                }));
-              }
-            } catch (err) {
-              // Don't fail immediately on poll errors, keep trying
-            }
-          }, 2000);
+      runBenchmark(url, device, connection)
+        .then((result) => {
+          clearInterval(interval);
+          if (!controller.signal.aborted) {
+            setState({ phase: 'completed', progress: 100, stage: 'Complete', result, error: null });
+          }
         })
         .catch((err) => {
-          cleanup();
-          setState({
-            phase: 'failed',
-            jobId: null,
-            progress: 0,
-            stage: '',
-            result: null,
-            error: err.message || 'Failed to start benchmark',
-          });
+          clearInterval(interval);
+          if (!controller.signal.aborted) {
+            setState({ phase: 'failed', progress: 0, stage: '', result: null, error: err.message || 'Benchmark failed' });
+          }
         });
     },
-    [cleanup],
+    [abortController],
   );
 
-  return {
-    ...state,
-    startBenchmark,
-    reset,
-    cancel,
-  };
+  return { ...state, startBenchmark, reset, cancel };
 }

@@ -11,28 +11,28 @@ import type {
   CachingAnalysis,
   CompressionAnalysis,
   HistoryEntry,
-} from '@/types';
-import { useGetHistory } from '@/hooks/useHistory';
-import { getHistoryForUrl, getFullResult } from '@/utils/storage';
+} from '@types/index';
+import { useGetHistory } from '@hooks/useHistory';
+import { getFullResult } from '@utils/storage';
 import {
   formatBytes,
   formatDuration,
   formatDate,
   formatTimeAgo,
   clsx,
-} from '@/utils/formatting';
-import ScoreOverview from '@/components/ScoreOverview';
-import ExportMenu from '@/components/ExportMenu';
-import WebVitalCard from '@/components/WebVitalCard';
-import NavigationTimeline from '@/components/NavigationTimeline';
-import OpportunityCard from '@/components/OpportunityCard';
-import DiagnosticCard from '@/components/DiagnosticCard';
-import AuditList from '@/components/AuditList';
-import ResourceTable from '@/components/ResourceTable';
-import ThirdPartyTable from '@/components/ThirdPartyTable';
-import ResourceBreakdownChart from '@/components/ResourceBreakdownChart';
-import WaterfallChart from '@/components/WaterfallChart';
-import ComparisonTable from '@/components/ComparisonTable';
+} from '@utils/formatting';
+import ScoreOverview from '@components/ScoreOverview';
+import ExportMenu from '@components/ExportMenu';
+import WebVitalCard from '@components/WebVitalCard';
+import NavigationTimeline from '@components/NavigationTimeline';
+import OpportunityCard from '@components/OpportunityCard';
+import DiagnosticCard from '@components/DiagnosticCard';
+import AuditList from '@components/AuditList';
+import ResourceTable from '@components/ResourceTable';
+import ThirdPartyTable from '@components/ThirdPartyTable';
+import ResourceBreakdownChart from '@components/ResourceBreakdownChart';
+import WaterfallChart from '@components/WaterfallChart';
+import ComparisonTable from '@components/ComparisonTable';
 
 const LazyOverviewTab = lazy(() => Promise.resolve({ default: OverviewTab }));
 const LazyPerformanceTab = lazy(() => Promise.resolve({ default: PerformanceTab }));
@@ -68,10 +68,8 @@ const DEVICE_LABELS: Record<string, string> = {
 };
 
 const CONNECTION_LABELS: Record<string, string> = {
-  fast: '⚡ Fast',
-  '4g': '📶 4G',
-  '3g': '📡 3G',
-  slow: '🐢 Slow',
+  fast: 'Fast',
+  '4g': '4G',
 };
 
 const TAB_CONTENT_STYLE: React.CSSProperties = {

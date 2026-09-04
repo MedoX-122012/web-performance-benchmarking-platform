@@ -10,7 +10,7 @@
 export type DeviceType = 'desktop' | 'mobile';
 
 /** Network connection profiles simulating different speeds */
-export type ConnectionProfile = 'fast' | '4g' | '3g' | 'slow';
+export type ConnectionProfile = 'fast' | '4g';
 
 // -----------------------------------------------------------------------------
 // Job Status

@@ -11,161 +11,27 @@ interface HeaderProps {
   onConnectionChange?: (connection: ConnectionProfile) => void;
 }
 
-const styles = {
-  header: {
-    position: 'sticky' as const,
-    top: 0,
-    zIndex: 200,
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    backgroundColor: 'rgba(10, 10, 15, 0.8)',
-    borderBottom: '1px solid var(--border-color)',
-  },
-  inner: {
-    maxWidth: 1400,
-    margin: '0 auto',
-    padding: '0 var(--space-lg)',
-    display: 'flex',
-    alignItems: 'center',
-    height: 64,
-    gap: 'var(--space-lg)',
-  },
-  logo: {
-    fontSize: 'var(--font-xl)',
-    fontWeight: 700,
-    letterSpacing: '-0.02em',
-    background: 'linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-    whiteSpace: 'nowrap' as const,
-    flexShrink: 0,
-  },
-  nav: {
-    display: 'flex',
-    gap: 'var(--space-xs)',
-    alignItems: 'center',
-  },
-  navLink: (active: boolean) => ({
-    padding: '6px 12px',
-    borderRadius: 'var(--radius-md)',
-    fontSize: 'var(--font-sm)',
-    fontWeight: 500,
-    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-    backgroundColor: active ? 'var(--bg-hover)' : 'transparent',
-    transition: 'all 150ms ease',
-    textDecoration: 'none',
-    whiteSpace: 'nowrap' as const,
-  }),
-  urlForm: {
-    flex: 1,
-    display: 'flex',
-    gap: 'var(--space-sm)',
-    alignItems: 'center',
-    maxWidth: 700,
-  },
-  urlInput: {
-    flex: 1,
-    padding: '10px 16px',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: 'var(--radius-lg)',
-    color: 'var(--text-primary)',
-    fontSize: 'var(--font-sm)',
-    fontFamily: '"SF Mono", "Fira Code", monospace',
-    outline: 'none',
-    transition: 'border-color 150ms ease, box-shadow 150ms ease',
-  },
-  selectGroup: {
-    display: 'flex',
-    gap: 'var(--space-sm)',
-    alignItems: 'center',
-  },
-  select: {
-    padding: '8px 12px',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: 'var(--radius-md)',
-    color: 'var(--text-primary)',
-    fontSize: 'var(--font-sm)',
-    cursor: 'pointer',
-    outline: 'none',
-    appearance: 'none' as const,
-    WebkitAppearance: 'none' as const,
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238888aa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'right 10px center',
-    paddingRight: 30,
-    minWidth: 100,
-  },
-  analyzeBtn: {
-    padding: '10px 24px',
-    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-    color: '#fff',
-    fontWeight: 600,
-    fontSize: 'var(--font-sm)',
-    borderRadius: 'var(--radius-lg)',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'opacity 150ms ease, transform 150ms ease',
-    whiteSpace: 'nowrap' as const,
-  },
-  settingsBtn: {
-    padding: 8,
-    borderRadius: 'var(--radius-md)',
-    color: 'var(--text-secondary)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'color 150ms ease, background-color 150ms ease',
-    flexShrink: 0,
-  },
-  hamburger: {
-    display: 'none',
-    padding: 8,
-    borderRadius: 'var(--radius-md)',
-    color: 'var(--text-secondary)',
-    flexShrink: 0,
-  },
-  mobileMenu: {
-    position: 'absolute' as const,
-    top: 64,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(10, 10, 15, 0.95)',
-    backdropFilter: 'blur(16px)',
-    borderBottom: '1px solid var(--border-color)',
-    padding: 'var(--space-md)',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: 'var(--space-sm)',
-    zIndex: 199,
-  },
-};
-
-const DEVICE_OPTIONS: { value: DeviceType; label: string; icon: string }[] = [
-  { value: 'desktop', label: 'Desktop', icon: '🖥️' },
-  { value: 'mobile', label: 'Mobile', icon: '📱' },
-];
-
-const CONNECTION_OPTIONS: { value: ConnectionProfile; label: string; icon: string }[] = [
-  { value: 'fast', label: 'Fast', icon: '⚡' },
-  { value: '4g', label: '4G', icon: '📶' },
-  { value: '3g', label: '3G', icon: '📡' },
-  { value: 'slow', label: 'Slow', icon: '🐢' },
-];
-
 const NAV_LINKS = [
   { to: '/', label: 'Dashboard' },
   { to: '/history', label: 'History' },
   { to: '/compare', label: 'Compare' },
 ];
 
+const DEVICE_OPTIONS: { value: DeviceType; label: string }[] = [
+  { value: 'desktop', label: 'Desktop' },
+  { value: 'mobile', label: 'Mobile' },
+];
+
+const CONNECTION_OPTIONS: { value: ConnectionProfile; label: string }[] = [
+  { value: 'fast', label: 'Fast' },
+  { value: '4g', label: '4G' },
+];
+
 export default function Header({
   onSubmit,
   showUrlInput = true,
   device = 'desktop',
-  connection = '4g',
+  connection = 'fast',
   onDeviceChange,
   onConnectionChange,
 }: HeaderProps) {
@@ -174,46 +40,59 @@ export default function Header({
   const inputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [location.pathname]);
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const handleSubmit = () => {
     const trimmed = url.trim();
     if (!trimmed) return;
-    let finalUrl = trimmed;
-    if (!/^https?:\/\//i.test(finalUrl)) {
-      finalUrl = `https://${finalUrl}`;
-    }
+    const finalUrl = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
     onSubmit?.(finalUrl);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSubmit();
-    }
-  };
-
-  const isActive = (path: string) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
-  };
+  const isActive = (path: string) => path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
-    <header style={styles.header} role="banner">
-      <div style={styles.inner}>
-        <Link to="/" style={{ textDecoration: 'none' }} aria-label="Benchmarker Home">
-          <span style={styles.logo}>⚡ Benchmarker</span>
+    <header
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 200,
+        backgroundColor: 'var(--bg-secondary)',
+        borderBottom: '1px solid var(--border-color)',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1400,
+          margin: '0 auto',
+          padding: '0 1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          height: 56,
+          gap: '1.5rem',
+        }}
+      >
+        <Link to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
+          <span style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+            Benchmarker
+          </span>
         </Link>
 
-        <nav style={styles.nav} className="hidden-mobile" aria-label="Main navigation">
+        <nav style={{ display: 'flex', gap: 4, alignItems: 'center' }} className="hidden-mobile">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              style={styles.navLink(isActive(link.to))}
-              aria-current={isActive(link.to) ? 'page' : undefined}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-sm)',
+                fontWeight: 500,
+                color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
+                backgroundColor: isActive(link.to) ? 'var(--bg-hover)' : 'transparent',
+                transition: 'all 120ms ease',
+                textDecoration: 'none',
+              }}
             >
               {link.label}
             </Link>
@@ -222,157 +101,129 @@ export default function Header({
 
         {showUrlInput && (
           <form
-            style={styles.urlForm}
             className="hidden-mobile"
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmit();
-            }}
-            role="search"
+            style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'center', maxWidth: 700 }}
+            onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
           >
             <input
               ref={inputRef}
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              onKeyDown={handleKeyDown}
               placeholder="Enter URL to benchmark..."
-              style={styles.urlInput}
-              aria-label="Website URL to benchmark"
-              autoComplete="url"
-              spellCheck={false}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                backgroundColor: 'var(--bg-primary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--text-primary)',
+                fontSize: 'var(--font-sm)',
+                fontFamily: '"SF Mono", "Fira Code", monospace',
+                outline: 'none',
+                transition: 'border-color 120ms ease',
+              }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; }}
+              aria-label="Website URL"
             />
-            <div style={styles.selectGroup}>
-              <select
-                value={device}
-                onChange={(e) => onDeviceChange?.(e.target.value as DeviceType)}
-                style={styles.select}
-                aria-label="Select device type"
-              >
-                {DEVICE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.icon} {opt.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={connection}
-                onChange={(e) => onConnectionChange?.(e.target.value as ConnectionProfile)}
-                style={styles.select}
-                aria-label="Select connection speed"
-              >
-                {CONNECTION_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.icon} {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={device}
+              onChange={(e) => onDeviceChange?.(e.target.value as DeviceType)}
+              style={{
+                padding: '8px 28px 8px 10px',
+                backgroundColor: 'var(--bg-primary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--text-primary)',
+                fontSize: 'var(--font-sm)',
+                cursor: 'pointer',
+                outline: 'none',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366707A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 8px center',
+              }}
+            >
+              {DEVICE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <select
+              value={connection}
+              onChange={(e) => onConnectionChange?.(e.target.value as ConnectionProfile)}
+              style={{
+                padding: '8px 28px 8px 10px',
+                backgroundColor: 'var(--bg-primary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--text-primary)',
+                fontSize: 'var(--font-sm)',
+                cursor: 'pointer',
+                outline: 'none',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366707A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 8px center',
+              }}
+            >
+              {CONNECTION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
             <button
               type="submit"
-              style={styles.analyzeBtn}
-              aria-label="Start benchmark analysis"
+              style={{
+                padding: '8px 20px',
+                backgroundColor: 'var(--color-primary)',
+                color: '#fff',
+                fontWeight: 500,
+                fontSize: 'var(--font-sm)',
+                borderRadius: 'var(--radius-md)',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 120ms ease',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-primary)'; }}
             >
               Analyze
             </button>
           </form>
         )}
 
-        <button
-          style={styles.settingsBtn}
-          className="hidden-mobile"
-          aria-label="Settings"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-        </button>
+        <div style={{ flex: 1 }} />
 
         <button
-          style={styles.hamburger}
           className="hidden-desktop"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle navigation menu"
-          aria-expanded={mobileOpen}
+          style={{ padding: 8, color: 'var(--text-secondary)' }}
+          aria-label="Toggle menu"
         >
-          {mobileOpen ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          )}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {mobileOpen ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></> : <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>}
+          </svg>
         </button>
       </div>
 
       {mobileOpen && (
-        <div style={styles.mobileMenu} className="hidden-desktop" role="navigation" aria-label="Mobile navigation">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              style={{
-                ...styles.navLink(isActive(link.to)),
-                padding: '10px 16px',
-                width: '100%',
-              }}
-              aria-current={isActive(link.to) ? 'page' : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="hidden-desktop" style={{ padding: '0.75rem 1.5rem 1rem', borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {NAV_LINKS.map((link) => (
+              <Link key={link.to} to={link.to} style={{ padding: '8px 12px', borderRadius: 'var(--radius-md)', fontSize: 'var(--font-sm)', fontWeight: 500, color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)', backgroundColor: isActive(link.to) ? 'var(--bg-hover)' : 'transparent', textDecoration: 'none' }}>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
           {showUrlInput && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit();
-              }}
-              style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}
-              role="search"
-            >
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="Enter URL to benchmark..."
-                style={{ ...styles.urlInput, width: '100%' }}
-                aria-label="Website URL to benchmark"
-              />
-              <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
-                <select
-                  value={device}
-                  onChange={(e) => onDeviceChange?.(e.target.value as DeviceType)}
-                  style={{ ...styles.select, flex: 1 }}
-                  aria-label="Select device type"
-                >
-                  {DEVICE_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.icon} {opt.label}
-                    </option>
-                  ))}
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+              <input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Enter URL..." style={{ padding: '8px 12px', backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: 'var(--font-sm)' }} />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <select value={device} onChange={(e) => onDeviceChange?.(e.target.value as DeviceType)} style={{ flex: 1, padding: '8px 10px', backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: 'var(--font-sm)' }}>
+                  {DEVICE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
-                <select
-                  value={connection}
-                  onChange={(e) => onConnectionChange?.(e.target.value as ConnectionProfile)}
-                  style={{ ...styles.select, flex: 1 }}
-                  aria-label="Select connection speed"
-                >
-                  {CONNECTION_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.icon} {opt.label}
-                    </option>
-                  ))}
+                <select value={connection} onChange={(e) => onConnectionChange?.(e.target.value as ConnectionProfile)} style={{ flex: 1, padding: '8px 10px', backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: 'var(--font-sm)' }}>
+                  {CONNECTION_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
-              <button type="submit" style={styles.analyzeBtn}>
-                Analyze
-              </button>
+              <button type="submit" style={{ padding: '8px 20px', backgroundColor: 'var(--color-primary)', color: '#fff', fontWeight: 500, fontSize: 'var(--font-sm)', borderRadius: 'var(--radius-md)', border: 'none' }}>Analyze</button>
             </form>
           )}
         </div>
