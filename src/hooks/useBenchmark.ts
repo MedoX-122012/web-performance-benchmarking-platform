@@ -114,8 +114,8 @@ export function useStartBenchmark() {
           clearInterval(interval);
           if (!controller.signal.aborted) {
             const msg = err.message || 'Benchmark failed';
-            const is429 = msg.includes('Rate limited') || msg.includes('rate limit');
-            const newCooldown = is429 ? getRemainingCooldown() : 0;
+            const isRateLimited = msg.includes('Rate limited') || msg.includes('rate limit') || msg.includes('Waiting');
+            const newCooldown = isRateLimited ? getRemainingCooldown() : 0;
 
             setState({ phase: 'failed', progress: 0, stage: '', result: null, error: msg, cooldown: newCooldown });
 

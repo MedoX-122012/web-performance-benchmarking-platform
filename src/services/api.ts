@@ -93,17 +93,22 @@ export async function runBenchmark(
 
     if (!res.ok) {
       let errorMsg = `Request failed (${res.status})`;
-      let retryAfter = 300;
+      let retryAfter = 0;
 
       try {
         const body = await res.json();
         errorMsg = body.message || body.error || errorMsg;
 
         if (res.status === 429) {
-          // Set cooldown: 5 minutes default
+          // Rate limit: 5 minutes cooldown
           retryAfter = 300;
           setCooldownUntil(Date.now() + retryAfter * 1000);
           errorMsg = `Rate limited by Google. Waiting ${retryAfter / 60} minutes before you can try again.`;
+        } else if (res.status === 500) {
+          // Google internal error: 60 seconds cooldown
+          retryAfter = 60;
+          setCooldownUntil(Date.now() + retryAfter * 1000);
+          errorMsg = `Google temporarily unavailable. Waiting ${retryAfter} seconds before you can try again.`;
         }
       } catch {
         const body = await res.text().catch(() => '');

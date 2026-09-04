@@ -44,9 +44,10 @@ function sleep(ms: number): Promise<void> {
 async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Response> {
   const response = await fetch(url);
 
-  if (response.status === 429 && retries > 0) {
+  // Retry on 429 (rate limit) and 500 (Google internal error - temporary)
+  if ((response.status === 429 || response.status === 500) && retries > 0) {
     const delay = RETRY_DELAYS[MAX_RETRIES - retries];
-    console.log(`[PSI] Rate limited (429). Retrying in ${delay / 1000}s... (${retries} retries left)`);
+    console.log(`[PSI] Error ${response.status}. Retrying in ${delay / 1000}s... (${retries} retries left)`);
     await sleep(delay);
     return fetchWithRetry(url, retries - 1);
   }
@@ -227,13 +228,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // WebPageTest fallback
-      if (psiResponse.status === 429) {
-        const fallbackResult = await tryWebPageTestFallback(url, strategy);
-        if (fallbackResult) {
-          return res.status(200).json(fallbackResult);
-        }
+      // WebPageTest fallback for any non-OK response
+      const fallbackResult = await tryWebPageTestFallback(url, strategy);
+      if (fallbackResult) {
+        return res.status(200).json(fallbackResult);
       }
+
       return res.status(psiResponse.status).json({ error: `PageSpeed API error: ${errText}` });
     }
 
